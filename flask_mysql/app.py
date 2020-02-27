@@ -72,10 +72,17 @@ def delete():
         details = request.form
         userEmail = details['userEmail']
         cur = mysql.connection.cursor()
-        cur.execute("DELETE FROM ADMIN_USER WHERE email=%s", [userEmail])
-        mysql.connection.commit()
+        cur.execute("SELECT first_name, last_name, email, password FROM ADMIN_USER WHERE email=%s", [userEmail])
+        data = cur.fetchone()
         cur.close()
-        return {'message':'success', 'status':200}
+        if data == None:
+            return {'message':'Userid not exists', 'status':404}
+        else:
+            cur = mysql.connection.cursor()
+            cur.execute("DELETE FROM ADMIN_USER WHERE email=%s", [userEmail])
+            mysql.connection.commit()
+            cur.close()
+            return {'message':'success', 'status':200}
     return {'message':'method not allowed', 'status':500}
 
 if __name__ == '__main__':
